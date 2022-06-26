@@ -5,6 +5,10 @@ This repository contains code from the paper "TTS-CGAN: A Transformer Time-Serie
 
 The paper is under review.
 
+This work is extended from the paper "TTS-GAN: A Transformer-based Time-Series Generative Adversarial Network".
+
+Check previous paper from [here](https://arxiv.org/abs/2202.02691). Get the code from [here](https://github.com/imics-lab/tts-gan).
+
 ---
 
 **Abstract:**
