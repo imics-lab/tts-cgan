@@ -87,31 +87,16 @@ def main_worker(gpu, ngpus_per_node, args):
                 nn.init.xavier_uniform(m.weight.data, 1.)
             else:
                 raise NotImplementedError('{} unknown inital type'.format(args.init_type))
-#         elif classname.find('Linear') != -1:
-#             if args.init_type == 'normal':
-#                 nn.init.normal_(m.weight.data, 0.0, 0.02)
-#             elif args.init_type == 'orth':
-#                 nn.init.orthogonal_(m.weight.data)
-#             elif args.init_type == 'xavier_uniform':
-#                 nn.init.xavier_uniform(m.weight.data, 1.)
-#             else:
-#                 raise NotImplementedError('{} unknown inital type'.format(args.init_type))
         elif classname.find('BatchNorm2d') != -1:
             nn.init.normal_(m.weight.data, 1.0, 0.02)
             nn.init.constant_(m.bias.data, 0.0)
 
     # import network
-    
-    # label encoding stack not add
-#     gen_net = Generator(seq_len=150, channels=1, num_classes=5, latent_dim=100, data_embed_dim=10, 
-#                         label_embed_dim=10 ,depth=3, num_heads=5, 
-#                         forward_drop_rate=0.5, attn_drop_rate=0.5)
     gen_net = Generator(seq_len=187, channels=1, num_classes=5, latent_dim=100, data_embed_dim=10, 
                         label_embed_dim=10 ,depth=3, num_heads=5, 
                         forward_drop_rate=0.5, attn_drop_rate=0.5)
     
     print(gen_net)
-#     dis_net = Discriminator(in_channels=1, patch_size=5, data_emb_size=50, label_emb_size=10, seq_length = 150, depth=3, n_classes=5)
     dis_net = Discriminator(in_channels=1, patch_size=1, data_emb_size=50, label_emb_size=10, seq_length = 187, depth=3, n_classes=5)
     print(dis_net)
     
@@ -123,9 +108,6 @@ def main_worker(gpu, ngpus_per_node, args):
         # DistributedDataParallel will use all available devices.
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
-#             gen_net = eval('models_search.'+args.gen_model+'.Generator')(args=args)
-#             dis_net = eval('models_search.'+args.dis_model+'.Discriminator')(args=args)
-
             gen_net.apply(weights_init)
             dis_net.apply(weights_init)
             gen_net.cuda(args.gpu)
@@ -207,16 +189,11 @@ def main_worker(gpu, ngpus_per_node, args):
         gen_optimizer.load_state_dict(checkpoint['gen_optimizer'])
         dis_optimizer.load_state_dict(checkpoint['dis_optimizer'])
         
-#         avg_gen_net = deepcopy(gen_net)
         gen_net.load_state_dict(checkpoint['avg_gen_state_dict'])
         gen_avg_param = copy_params(gen_net, mode='gpu')
         gen_net.load_state_dict(checkpoint['gen_state_dict'])
         fixed_z = checkpoint['fixed_z']
-#         del avg_gen_net
-#         gen_avg_param = list(p.cuda().to(f"cuda:{args.gpu}") for p in gen_avg_param)
         
-        
-
         args.path_helper = checkpoint['path_helper']
         logger = create_logger(args.path_helper['log_path']) if args.rank == 0 else None
         print(f'=> loaded checkpoint {checkpoint_file} (epoch {start_epoch})')
@@ -258,15 +235,10 @@ def main_worker(gpu, ngpus_per_node, args):
         plot_buf = gen_plot(gen_net, epoch)
         image = PIL.Image.open(plot_buf)
         image = ToTensor()(image).unsqueeze(0)
-        #writer = SummaryWriter(comment='synthetic signals')
         writer.add_image('Image', image[0], epoch)
-        
         is_best = False
         avg_gen_net = deepcopy(gen_net)
         load_params(avg_gen_net, gen_avg_param, args)
-#         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-#                 and args.rank == 0):
-# Add module in model saving code exp'gen_net.module.state_dict()' to solve the model loading unpaired name problem
         save_checkpoint({
             'epoch': epoch + 1,
             'gen_model': args.gen_model,
@@ -290,7 +262,6 @@ def gen_plot(gen_net, epoch):
     for i in range(10):
         fake_noise = torch.FloatTensor(np.random.normal(0, 1, (1, 100)))
         fake_label = torch.randint(0, 5, (1,))
-#         fake_label = torch.randint(0, 1, (1,))
         fake_sigs = gen_net(fake_noise, fake_label).to('cpu').detach().numpy()
         
         synthetic_data.append(fake_sigs)

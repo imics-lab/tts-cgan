@@ -30,7 +30,7 @@ class mitbih_train(Dataset):
         data_4 = data_train[data_train[187] == 4]
         
         data_0_resample = resample(data_0, n_samples=n_samples, 
-                           random_state=123, replace=True)
+                                   random_state=123, replace=True)
         data_1_resample = resample(data_1, n_samples=n_samples, 
                                    random_state=123, replace=True)
         data_2_resample = resample(data_2, n_samples=n_samples, 
@@ -43,7 +43,6 @@ class mitbih_train(Dataset):
         train_dataset = pd.concat((data_0_resample, data_1_resample, 
                                   data_2_resample, data_3_resample, data_4_resample))
         
-#         self.X_train = train_dataset.iloc[:, 0:150].values
         self.X_train = train_dataset.iloc[:, :-1].values
         if oneD:
             self.X_train = self.X_train.reshape(self.X_train.shape[0], 1, self.X_train.shape[1])
@@ -88,7 +87,6 @@ class mitbih_test(Dataset):
         test_dataset = pd.concat((data_0_resample, data_1_resample, 
                                   data_2_resample, data_3_resample, data_4_resample))
         
-#         self.X_test = data_test.iloc[:, 0:150].values
         self.X_test = test_dataset.iloc[:, :-1].values
         if oneD:
             self.X_test = self.X_test.reshape(self.X_test.shape[0], 1, self.X_test.shape[1])

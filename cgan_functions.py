@@ -105,7 +105,6 @@ def train(args, gen_net: nn.Module, dis_net: nn.Module, gen_optimizer, dis_optim
         
         dis_net.zero_grad()
         r_out_adv, r_out_cls = dis_net(real_imgs)
-#         fake_imgs = gen_net(noise, fake_img_labels).detach()  # why detach() here? 
         fake_imgs = gen_net(noise, fake_img_labels)
         
         assert fake_imgs.size() == real_imgs.size(), f"fake_imgs.size(): {fake_imgs.size()} real_imgs.size(): {real_imgs.size()}"
@@ -136,12 +135,10 @@ def train(args, gen_net: nn.Module, dis_net: nn.Module, gen_optimizer, dis_optim
         #  Train Generator
         # -----------------
         
-#         gen_optimizer.zero_grad()
         gen_net.zero_grad()
 
         gen_imgs = gen_net(noise, fake_img_labels)
         g_out_adv, g_out_cls = dis_net(gen_imgs)
-#         g_out_adv, g_out_cls = dis_net(fake_imgs)
 
         g_adv_loss = -torch.mean(g_out_adv)
         g_cls_loss = cls_criterion(g_out_cls, fake_img_labels)    
