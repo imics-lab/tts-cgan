@@ -23,6 +23,41 @@ Use Wavelet Coherence score to compare the similarity between two sets of signal
 **The TTS-CGAN Architecture** 
 ![TTS-CGAN Architecture](./TTS-CGAN.png)
 
+---
+**Code structure:**
+
+**TransCGN_model.py**: The tts-cgan model architecture. It contains the code of the transformor-based generator and discriminator. The generator has embeded label information. The discriminator has two classficatio heads, one is for adversarial classification and another one is for categorical classfication.    
+
+**trainCGAN.py**: Contains code for model initialization, load dataset, and training process. Several intermediate results will show on the Tensorboard.
+
+**Dataloader.py**: The PyTorch dataloader written for loading mitbih heat beat signals. Download the dataset mitbih_train.csv and mitbih_test.csv from [here](https://www.kaggle.com/code/azazurrehmanbutt/ecg-classification-using-cnn-lstm/data?scriptVersionId=74982392) and save it to your code directory. 
+
+**synDataloader.py**: The PyTorch dataloader written for loading mitbih synthetic signals from trained generator model. 
+
+**mitbih_checkpoint**: A pretrained TTS-CGAN checkpoint.
+
+**cgan_functions.py**, utils.py: contains some helper functions. 
+
+**adamw.py**: adamw implementation. 
+
+**cfg.py**: the definition of parse arguments. 
+
+**mitbit_Train_CGAN.py**: a script used for start model training. 
+
+**classification.ipynb**: Post-hoc classficaiton example used for generating the plots in paper Figure 10. 
+
+**LookAtData.ipynb**: show some plots of real mitbih heartbeat signals and synthetic signals. 
+
+**The folder Label-embedding**: contains code used for generating the plots in paper Figure 5. 
 
 
+**Implementation structions:**
 
+
+To re-train the model: 
+```
+python mitbih_Train_CGAN.py
+```
+Modify the parse arguments to fit for your dataset. 
+
+---
